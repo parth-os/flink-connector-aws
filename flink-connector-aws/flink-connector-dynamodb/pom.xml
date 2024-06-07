@@ -39,6 +39,7 @@ under the License.
         Required by DynamoDbSinkITCase --> --add-opens=java.base/java.util=ALL-UNNAMED <!--
         Required by DynamoDbSinkITCase --> --add-opens=java.base/java.lang=ALL-UNNAMED
         </flink.connector.module.config>
+
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -66,6 +67,19 @@ under the License.
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-streaming-java</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-clients -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-clients</artifactId>
+            <version>1.18.0</version>
+        </dependency>
+
+
         <!-- Flink Connector DynamoDB Dependencies -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
@@ -74,6 +88,16 @@ under the License.
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>dynamodb-enhanced</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
         <!-- Table ecosystem -->
@@ -143,6 +167,10 @@ under the License.
             <artifactId>flink-table-planner-loader</artifactId>
             <version>${flink.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
     </dependencies>
