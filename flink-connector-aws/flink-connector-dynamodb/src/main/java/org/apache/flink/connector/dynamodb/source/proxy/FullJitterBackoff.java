@@ -30,7 +30,7 @@ import java.util.Random;
 @Internal
 public class FullJitterBackoff {
 
-    /** Random seed used to calculate backoff jitter for Kinesis operations. */
+    /** Random seed used to calculate backoff jitter for DynamoDb Streams operations. */
     private final Random seed = new Random();
 
     /**

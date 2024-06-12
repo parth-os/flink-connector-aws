@@ -83,7 +83,7 @@ public class DynamoDbStreamsSourceEnumeratorStateSerializer
 
             if (version != getVersion()) {
                 throw new VersionMismatchException(
-                        "Trying to deserialize KinesisStreamsSourceEnumeratorState serialized with unsupported version "
+                        "Trying to deserialize DynamoDbStreamsSourceEnumeratorState serialized with unsupported version "
                                 + version
                                 + ". Serializer version is "
                                 + getVersion());

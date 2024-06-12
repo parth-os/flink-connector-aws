@@ -118,6 +118,7 @@ public class DynamoDBStreamsProxy extends KinesisProxy {
         try {
             return super.getShardIterator(shard, shardIteratorType, startingMarker);
         } catch (ResourceNotFoundException re) {
+            //See: https://github.com/apache/flink-connector-aws/commit/d5d6a6334312c99d1b24324da2de3f77e98654f2
             LOG.info(
                     "Received ResourceNotFoundException. "
                             + "Shard {} of stream {} is no longer valid, marking it as complete.",

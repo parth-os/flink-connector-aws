@@ -37,7 +37,8 @@ public class DdbStreamsApp {
 
         Configuration dynamodbStreamsConsumerConfig = new Configuration();
         final String streamName =
-        "arn:aws:dynamodb:us-east-1:946375648974:table/pooniwal-test/stream/2024-04-11T07:14:19.380";
+                "arn:aws:dynamodb:us-east-1:1231231230:table/test/stream/2024-04-11T07:14:19.380";
+
         dynamodbStreamsConsumerConfig.setString(
         AWSConfigConstants.AWS_REGION, "us-east-1");
 

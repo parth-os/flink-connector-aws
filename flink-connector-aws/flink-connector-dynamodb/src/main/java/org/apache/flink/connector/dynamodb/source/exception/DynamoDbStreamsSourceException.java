@@ -27,8 +27,8 @@ import org.apache.flink.util.FlinkRuntimeException;
  * DynamoDbStreamsSource}.
  */
 @Internal
-public class KinesisStreamsSourceException extends FlinkRuntimeException {
-    public KinesisStreamsSourceException(String message, Throwable cause) {
+public class DynamoDbStreamsSourceException extends FlinkRuntimeException {
+    public DynamoDbStreamsSourceException(String message, Throwable cause) {
         super(message, cause);
     }
 }

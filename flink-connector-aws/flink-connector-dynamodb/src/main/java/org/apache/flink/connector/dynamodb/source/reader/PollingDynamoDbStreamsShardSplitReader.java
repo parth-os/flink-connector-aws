@@ -39,14 +39,14 @@ import java.util.*;
 import static java.util.Collections.singleton;
 
 /**
- * An implementation of the SplitReader that periodically polls the Kinesis stream to retrieve
+ * An implementation of the SplitReader that periodically polls the DynamoDb stream to retrieve
  * records.
  */
 @Internal
 public class PollingDynamoDbStreamsShardSplitReader implements SplitReader<Record, DynamoDbStreamsShardSplit> {
 
     private static final RecordsWithSplitIds<Record> INCOMPLETE_SHARD_EMPTY_RECORDS =
-            new KinesisRecordsWithSplitIds(Collections.emptyIterator(), null, false);
+            new  DynamoDbStreamRecordsWithSplitIds(Collections.emptyIterator(), null, false);
 
     private final StreamProxy dynamodbStreams;
 
@@ -71,14 +71,13 @@ public class PollingDynamoDbStreamsShardSplitReader implements SplitReader<Recor
                         splitState.getStreamArn(),
                         splitState.getShardId(),
                         splitState.getNextStartingPosition());
-        boolean isComplete = getRecordsResponse.nextShardIterator() == null;
+        boolean isComplete =
+                getRecordsResponse == null ||
+                getRecordsResponse.nextShardIterator() == null;
 
-
-        System.out.println(MAPPER.writeValueAsString(getRecordsResponse.records()));
-        System.out.println(" ... ... ... ... ... ");
         if (hasNoRecords(getRecordsResponse)) {
             if (isComplete) {
-                return new KinesisRecordsWithSplitIds(
+                return new DynamoDbStreamRecordsWithSplitIds(
                         Collections.emptyIterator(), splitState.getSplitId(), true);
             } else {
                 assignedSplits.add(splitState);
@@ -95,12 +94,13 @@ public class PollingDynamoDbStreamsShardSplitReader implements SplitReader<Recor
                                 .sequenceNumber()));
 
         assignedSplits.add(splitState);
-        return new KinesisRecordsWithSplitIds(
+        return new DynamoDbStreamRecordsWithSplitIds(
                 getRecordsResponse.records().iterator(), splitState.getSplitId(), isComplete);
     }
 
     private boolean hasNoRecords(GetRecordsResponse getRecordsResponse) {
-        return !getRecordsResponse.hasRecords() || getRecordsResponse.records().isEmpty();
+        return getRecordsResponse == null ||
+                !getRecordsResponse.hasRecords() || getRecordsResponse.records().isEmpty();
     }
 
     @Override
@@ -120,13 +120,13 @@ public class PollingDynamoDbStreamsShardSplitReader implements SplitReader<Recor
         dynamodbStreams.close();
     }
 
-    private static class KinesisRecordsWithSplitIds implements RecordsWithSplitIds<Record> {
+    private static class DynamoDbStreamRecordsWithSplitIds implements RecordsWithSplitIds<Record> {
 
         private final Iterator<Record> recordsIterator;
         private final String splitId;
         private final boolean isComplete;
 
-        public KinesisRecordsWithSplitIds(
+        public DynamoDbStreamRecordsWithSplitIds(
                 Iterator<Record> recordsIterator, String splitId, boolean isComplete) {
             this.recordsIterator = recordsIterator;
             this.splitId = splitId;

@@ -35,7 +35,7 @@ import java.util.Map;
 /**
  * Coordinates the reading from assigned splits. Runs on the TaskManager.
  *
- * @param <T> the data type emitted by the Kinesis stream source
+ * @param <T> the data type emitted by the DynamoDb stream source
  */
 @Internal
 public class DynamoDbStreamsSourceReader<T>

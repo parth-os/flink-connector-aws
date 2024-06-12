@@ -43,6 +43,9 @@ public class DynamoDbStreamsProxy implements StreamProxy {
                 shardIdToIteratorStore.computeIfAbsent(
                         shardId, (s) -> getShardIterator(streamArn, s, startingPosition));
 
+        if (shardIterator == null) {
+            return null;
+        }
         try {
             GetRecordsResponse getRecordsResponse = getRecords(shardIterator);
             if (getRecordsResponse.nextShardIterator() != null) {
@@ -156,7 +159,16 @@ public class DynamoDbStreamsProxy implements StreamProxy {
                 }
         }
 
-        return dynamoDbStreamsClient.getShardIterator(requestBuilder.build()).shardIterator();
+        try {
+            return dynamoDbStreamsClient.getShardIterator(requestBuilder.build()).shardIterator();
+        } catch (ResourceNotFoundException e) {
+            LOG.info(
+                    "Received ResourceNotFoundException. "
+                            + "Shard {} of stream {} is no longer valid, marking it as complete.",
+                    shardId,
+                    streamArn);
+            return null;
+        }
     }
 
     private GetRecordsResponse getRecords(String shardIterator) {

@@ -30,13 +30,13 @@ import org.apache.flink.connector.dynamodb.source.serialization.DynamoDbStreamsD
  * Builder to construct the {@link DynamoDbStreamsSource}.
  *
  * <p>The following example shows the minimum setup to create a {@link DynamoDbStreamsSource} that
- * reads String values from a Kinesis Data Streams stream with ARN of
- * arn:aws:kinesis:us-east-1:012345678901:stream/your_stream_name.
+ * reads String values from a DynamoDb stream with ARN of
+ * arn:aws:dynamodb:us-east-1:012345678901:table/your_table_name/stream/stream-label.
  *
  * <pre>{@code
- * KinesisStreamsSource<String> kdsSource =
- *                 KinesisStreamsSource.<String>builder()
- *                         .setStreamArn("arn:aws:kinesis:us-east-1:012345678901:stream/your_stream_name")
+ * DynamoDbStreamsSource<String> dynamoDbStreamsSource =
+ *                 DynamoDbStreamsSource.<String>builder()
+ *                         .setStreamArn("arn:aws:dynamodb:us-east-1:012345678901:table/your_table_name/stream/stream-label")
  *                         .setDeserializationSchema(new SimpleStringSchema())
  *                         .build();
  * }</pre>
@@ -44,7 +44,7 @@ import org.apache.flink.connector.dynamodb.source.serialization.DynamoDbStreamsD
  * <p>If the following parameters are not set in this builder, the following defaults will be used:
  *
  * <ul>
- *   <li>{@code kinesisShardAssigner} will be {@link UniformShardAssigner}
+ *   <li>{@code dynamoDbStreamsShardAssigner} will be {@link UniformShardAssigner}
  * </ul>
  *
  * @param <T> type of elements that should be read from the source stream
@@ -54,7 +54,7 @@ public class DynamoDbStreamsSourceBuilder<T> {
     private String streamArn;
     private Configuration sourceConfig;
     private DynamoDbStreamsDeserializationSchema<T> deserializationSchema;
-    private DynamoDbStreamsShardAssigner kinesisShardAssigner = ShardAssignerFactory.uniformShardAssigner();
+    private DynamoDbStreamsShardAssigner dynamoDbStreamsShardAssigner = ShardAssignerFactory.uniformShardAssigner();
 
     public DynamoDbStreamsSourceBuilder<T> setStreamArn(String streamArn) {
         this.streamArn = streamArn;
@@ -79,13 +79,13 @@ public class DynamoDbStreamsSourceBuilder<T> {
     }
 
     public DynamoDbStreamsSourceBuilder<T> setDynamoDbStreamsShardAssigner(
-            DynamoDbStreamsShardAssigner kinesisShardAssigner) {
-        this.kinesisShardAssigner = kinesisShardAssigner;
+            DynamoDbStreamsShardAssigner dynamoDbStreamsShardAssigner) {
+        this.dynamoDbStreamsShardAssigner = dynamoDbStreamsShardAssigner;
         return this;
     }
 
     public DynamoDbStreamsSource<T> build() {
         return new DynamoDbStreamsSource<>(
-                streamArn, sourceConfig, deserializationSchema, kinesisShardAssigner);
+                streamArn, sourceConfig, deserializationSchema, dynamoDbStreamsShardAssigner);
     }
 }

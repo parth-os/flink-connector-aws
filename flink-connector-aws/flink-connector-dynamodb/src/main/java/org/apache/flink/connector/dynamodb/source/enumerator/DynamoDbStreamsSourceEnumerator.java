@@ -25,7 +25,7 @@ import org.apache.flink.api.connector.source.SplitEnumeratorContext;
 import org.apache.flink.api.connector.source.SplitsAssignment;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.connector.dynamodb.source.config.DynamodbStreamsSourceConfigConstants.InitialPosition;
-import org.apache.flink.connector.dynamodb.source.exception.KinesisStreamsSourceException;
+import org.apache.flink.connector.dynamodb.source.exception.DynamoDbStreamsSourceException;
 import org.apache.flink.connector.dynamodb.source.proxy.StreamProxy;
 import org.apache.flink.connector.dynamodb.source.split.DynamoDbStreamsShardSplit;
 import org.apache.flink.connector.dynamodb.source.split.StartingPosition;
@@ -36,16 +36,14 @@ import software.amazon.awssdk.services.dynamodb.model.Shard;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.*;
 import java.util.Map.Entry;
 
 import static org.apache.flink.connector.dynamodb.source.config.DynamodbStreamsSourceConfigConstants.SHARD_DISCOVERY_INTERVAL_MILLIS;
 import static org.apache.flink.connector.dynamodb.source.config.DynamodbStreamsSourceConfigConstants.STREAM_INITIAL_POSITION;
-import static org.apache.flink.connector.dynamodb.source.config.DynamoDbStreamsSourceConfigUtil.parseStreamTimestampStartingPosition;
 
 /**
- * This class is used to discover and assign Kinesis splits to subtasks on the Flink cluster. This
+ * This class is used to discover and assign DynamoDb Streams splits to subtasks on the Flink cluster. This
  * runs on the JobManager.
  */
 @Internal
@@ -150,13 +148,14 @@ public class DynamoDbStreamsSourceEnumerator
     }
 
     /**
-     * This method is used to discover Kinesis splits the job can subscribe to. It can be run in
+     * This method is used to discover DynamoDb Streams splits the job can subscribe to. It can be run in
      * parallel, is important to not mutate any shared state.
      *
      * @return list of discovered splits
      */
     private List<DynamoDbStreamsShardSplit> periodicallyDiscoverSplits() {
         List<Shard> shards = streamProxy.listShards(streamArn, lastSeenShardId);
+
         // Any shard discovered after the initial startup should be read from the start, since they
         // come from resharding
         return mapToSplits(shards, InitialPosition.TRIM_HORIZON);
@@ -168,7 +167,7 @@ public class DynamoDbStreamsSourceEnumerator
         switch (initialPosition) {
             case LATEST:
                 //TODO: Figure out how to handle this for DDB Streams
-                // For kinesis If LATEST is requested, we still set the starting position to the time of
+                // For dynamodb streams If LATEST is requested, we still set the starting position to the time of
                 // startup. This way, the job starts reading from a deterministic timestamp
                 // (i.e. time of job submission), even if it enters a restart loop immediately
                 // after submission.
@@ -190,7 +189,7 @@ public class DynamoDbStreamsSourceEnumerator
     }
 
     /**
-     * This method assigns a given set of Kinesis splits to the readers currently registered on the
+     * This method assigns a given set of DynamoDb Streams splits to the readers currently registered on the
      * cluster. This assignment is done via a side-effect on the {@link SplitEnumeratorContext}
      * object.
      *
@@ -199,7 +198,7 @@ public class DynamoDbStreamsSourceEnumerator
      */
     private void assignSplits(List<DynamoDbStreamsShardSplit> discoveredSplits, Throwable throwable) {
         if (throwable != null) {
-            throw new KinesisStreamsSourceException("Failed to list shards.", throwable);
+            throw new DynamoDbStreamsSourceException("Failed to list shards.", throwable);
         }
 
         if (context.registeredReaders().size() < context.currentParallelism()) {

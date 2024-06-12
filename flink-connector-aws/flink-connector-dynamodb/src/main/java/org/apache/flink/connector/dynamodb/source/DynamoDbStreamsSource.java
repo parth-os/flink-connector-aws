@@ -55,18 +55,18 @@ import java.util.function.Supplier;
 
 /**
  * The {@link DynamoDbStreamsSource} is an exactly-once parallel streaming data source that
- * subscribes to a single AWS Kinesis data stream. It is able to handle resharding of streams, and
- * stores its current progress in Flink checkpoints. The source will read in data from the Kinesis
- * Data stream, deserialize it using the provided {@link DeserializationSchema}, and emit the record
+ * subscribes to a single AWS DynamoDb stream. It is able to handle resharding of streams, and
+ * stores its current progress in Flink checkpoints. The source will read in data from the DynamoDb
+ * stream, deserialize it using the provided {@link DeserializationSchema}, and emit the record
  * into the Flink job graph.
  *
  * <p>Exactly-once semantics. To leverage Flink's checkpointing mechanics for exactly-once stream
- * processing, the Kinesis Source is implemented with the AWS Java SDK, instead of the officially
- * recommended AWS Kinesis Client Library. The source will store its current progress in Flink
+ * processing, the DynamoDb Stream Source is implemented with the AWS Java SDK, instead of the officially
+ * recommended AWS DynamoDb Stream Client Library. The source will store its current progress in Flink
  * checkpoint/savepoint, and will pick up from where it left off upon restore from the
  * checkpoint/savepoint.
  *
- * <p>Initial starting points. The Kinesis Streams Source supports reads starting from TRIM_HORIZON,
+ * <p>Initial starting points. The DynamoDb Stream Source supports reads starting from TRIM_HORIZON,
  * LATEST, and AT_TIMESTAMP.
  *
  * @param <T> the data type emitted by the source
@@ -78,22 +78,22 @@ public class DynamoDbStreamsSource<T>
     protected final String streamArn;
     protected final Configuration sourceConfig;
     protected final DynamoDbStreamsDeserializationSchema<T> deserializationSchema;
-    protected final DynamoDbStreamsShardAssigner kinesisShardAssigner;
+    protected final DynamoDbStreamsShardAssigner dynamoDbStreamsShardAssigner;
 
     DynamoDbStreamsSource(
             String streamArn,
             Configuration sourceConfig,
             DynamoDbStreamsDeserializationSchema<T> deserializationSchema,
-            DynamoDbStreamsShardAssigner kinesisShardAssigner) {
+            DynamoDbStreamsShardAssigner dynamoDbStreamsShardAssigner) {
         Preconditions.checkNotNull(streamArn);
         Preconditions.checkArgument(!streamArn.isEmpty(), "stream ARN cannot be empty string");
         Preconditions.checkNotNull(sourceConfig);
         Preconditions.checkNotNull(deserializationSchema);
-        Preconditions.checkNotNull(kinesisShardAssigner);
+        Preconditions.checkNotNull(dynamoDbStreamsShardAssigner);
         this.streamArn = streamArn;
         this.sourceConfig = sourceConfig;
         this.deserializationSchema = deserializationSchema;
-        this.kinesisShardAssigner = kinesisShardAssigner;
+        this.dynamoDbStreamsShardAssigner = dynamoDbStreamsShardAssigner;
     }
 
     /**
@@ -151,7 +151,7 @@ public class DynamoDbStreamsSource<T>
                 streamArn,
                 sourceConfig,
                 createDynamoDbStreamsProxy(sourceConfig),
-                kinesisShardAssigner,
+                dynamoDbStreamsShardAssigner,
                 checkpoint);
     }
 

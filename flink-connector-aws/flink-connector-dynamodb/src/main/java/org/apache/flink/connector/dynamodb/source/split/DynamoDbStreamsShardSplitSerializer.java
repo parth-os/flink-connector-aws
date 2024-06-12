@@ -73,7 +73,7 @@ public class DynamoDbStreamsShardSplitSerializer implements SimpleVersionedSeria
                 DataInputStream in = new DataInputStream(bais)) {
             if (version != getVersion()) {
                 throw new VersionMismatchException(
-                        "Trying to deserialize KinesisShardSplit serialized with unsupported version "
+                        "Trying to deserialize DynamoDbStreamsShardSplit serialized with unsupported version "
                                 + version
                                 + ". Version of serializer is "
                                 + getVersion());

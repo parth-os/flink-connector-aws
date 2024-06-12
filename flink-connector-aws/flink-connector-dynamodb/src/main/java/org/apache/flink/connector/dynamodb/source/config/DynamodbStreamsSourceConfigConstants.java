@@ -61,7 +61,7 @@ public class DynamodbStreamsSourceConfigConstants {
     public static final String BASE_DDB_STREAMS_USER_AGENT_PREFIX_FORMAT =
             "Apache Flink %s (%s) DynamoDb Streams Connector";
 
-    /** Kinesis identifier for user agent prefix. */
+    /** DynamoDb Streams identifier for user agent prefix. */
     public static final String DDB_STREAMS_CLIENT_USER_AGENT_PREFIX =
             "aws.dynamodbstreams.client.user-agent-prefix";
 }
